@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Budget Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://kit.fontawesome.com/bb847014c4.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet">
+
+  <script type="text/javascript" src="js/script.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <span class="fa-solid fa-calculator"></span>
+    <h1>Budget Calculator</h1>
+  </header>
+  <main>
+    <section class="form">
+      <div>
+        <button id="calculate">CALCULATE</button>
+      </div>
+      <form id="form">
+      </form>
+      <!-- <form id="form2"></form>
+      <script id="new-form" type="text/x-handlebars-template">
+        {{each data}}
+          <fieldset id="id">
+            <h2>
+              heading2
+            </h2>
+            <span></span>
+            <label></label>
+            <input>
+            <button></button>
+          </fieldset>
+        {{/each}}
+      </script> -->
+    </section>
+    <section id="charts">
+      <div id="total">Your total montly expansex: <span id="sum">$0.00</span></div>
+      <div id="total-chart">
+        <canvas id="myChart"></canvas>
+      </div>
+    </section>
+  </main>
+</body>
+
+</html>

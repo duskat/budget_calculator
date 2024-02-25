@@ -1,0 +1,91 @@
+{
+  "data": [
+    {
+      "sectionName": "essentials",
+      "items": [
+        {
+          "id": "mortgage",
+          "labelName": "Mortgage Patment"
+        },
+        {
+          "id": "hoa",
+          "labelName": "HOA Patment"
+        },
+        {
+          "id": "car-lease",
+          "labelName": "Car Lease Payment"
+        },
+        {
+          "id": "car-insurance",
+          "labelName": "car insurancet Patment"
+        },
+        {
+          "id": "day-care",
+          "labelName": "day care Payment"
+        },
+        {
+          "id": "add-essentil",
+          "labelName": "add essentil Patment"
+        }
+      ]
+    },
+    {
+      "sectionName": "utilities",
+      "items": [
+        {
+          "id": "electricity",
+          "labelName": "electricity Patment"
+        },
+        {
+          "id": "gas",
+          "labelName": "gas Patment"
+        },
+        {
+          "id": "water",
+          "labelName": "water Payment"
+        },
+        {
+          "id": "internet",
+          "labelName": "internet Patment"
+        },
+        {
+          "id": "mobile-phone",
+          "labelName": "mobile phone Patment"
+        },
+        {
+          "id": "add-utilitie",
+          "labelName": "add utilitie Patment"
+        }
+      ]
+    },
+    {
+      "sectionName": "others",
+      "items": [
+        {
+          "id": "groceries",
+          "labelName": "groceries"
+        },
+        {
+          "id": "entertainments",
+          "labelName": "entertainments"
+        },
+        {
+          "id": "eating-out",
+          "labelName": "eating out"
+        },
+        {
+          "id": "gym",
+          "labelName": "gym"
+        },
+        {
+          "id": "miscellaneous",
+          "labelName": "Miscellaneous"
+        },
+        {
+          "id": "add-other",
+          "labelName": "add other Patment"
+        }
+      ]
+    }
+  ]
+}
