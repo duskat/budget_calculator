@@ -4,7 +4,7 @@
   font-family: "Roboto", sans-serif;
   font-size: 18px;
   box-sizing: border-box;
-  max-width: 1120px;
+  max-width: 1020px;
 }
 
 body {
@@ -19,6 +19,10 @@ main {
 @media screen and (max-width: 480px) {
   main {
     flex-direction: column;
+  }
+
+  h1 {
+    font-size: 30px;
   }
 }
 
@@ -49,7 +53,7 @@ button#calculate {
   font-size: 25px;
   background: #49c1a2;
   width: 100%;
-  margin: 20px 0;
+  margin: 0;
   padding: 15px;
   opacity: 0.8;
   border: 2px solid lightgray;
@@ -103,6 +107,11 @@ div.collapse:hover {
   width: 500px;
 }
 
+.sticky {
+  position: sticky;
+  top: 0
+}
+
 div#total {
   margin: 20px 0;
   padding: 20px;
@@ -112,6 +121,8 @@ div#total {
   margin-bottom: 20px;
   box-shadow: -3px 0px 8px 0 rgb(0 0 0 / 0%), 0px 0px 9px 0 rgba(0, 0, 0, 0.19);
   font-weight: 300;
+  float: left;
+  width: 100%;
 }
 
 input {

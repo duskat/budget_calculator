@@ -54,7 +54,6 @@ const createForm = (data) => {
 
     section.items.forEach((item, index) => {
       const label = document.createElement('label');
-      setAttributes(label, { for: item.id });
       label.textContent = toCamelCase(item.labelName);
 
       const input = document.createElement('input');
@@ -170,7 +169,6 @@ function creatInput(val, el) {
   const label = document.createElement('label');
   val = val.trim();
   label.innerText = toCamelCase(val);
-  label.setAttribute('for', val);
   const input = createElementWithClasses('input', 'new-input-added', val);
   setAttributes(input, {
     type: 'text',
