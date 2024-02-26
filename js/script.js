@@ -62,7 +62,6 @@ const createForm = (data) => {
         placeholder: 'Numbers Only',
         id: item.id,
         name: item.id,
-        inputmode: 'numeric',
       });
 
       const inputsSet = createElementWithClasses('span', 'input-set');
