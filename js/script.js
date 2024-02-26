@@ -63,7 +63,6 @@ const createForm = (data) => {
         id: item.id,
         name: item.id,
         inputmode: 'numeric',
-        pattern: '[0-9]*',
       });
 
       const inputsSet = createElementWithClasses('span', 'input-set');
@@ -92,7 +91,6 @@ const createForm = (data) => {
           placeholder: 'Please entre the payment',
           id: item.id,
           name: item.id,
-          inputmode: 'numeric',
           pattern: '[0-9]*',
         });
         input.classList.add('add-new-item');
