@@ -30,7 +30,7 @@ function toCamelCase(value) {
 
 // Создание HTML-структуры на основе данных
 const createForm = (data) => {
-  const form = document.getElementById('form');
+  const form = document.querySelector('form');
   data.forEach((section) => {
     const fieldset = createElementWithClasses(
       'fieldset',
@@ -54,6 +54,9 @@ const createForm = (data) => {
 
     section.items.forEach((item, index) => {
       const label = document.createElement('label');
+      setAttributes(label, {
+        for: item.id,
+      });
       label.textContent = toCamelCase(item.labelName);
 
       const input = document.createElement('input');
@@ -62,6 +65,8 @@ const createForm = (data) => {
         placeholder: 'Numbers Only',
         id: item.id,
         name: item.id,
+        autocomplete: 'one-time-code',
+        inputmode: 'numeric',
       });
 
       const inputsSet = createElementWithClasses('span', 'input-set');
@@ -86,11 +91,12 @@ const createForm = (data) => {
       if (index === section.items.length - 1) {
         input.after(addButton);
         setAttributes(input, {
+          type: 'text',
           class: 'add-new-item',
           placeholder: 'Please entre the payment',
           id: item.id,
           name: item.id,
-          pattern: '[0-9]*',
+          inputmode: 'text',
         });
         input.classList.add('add-new-item');
         removeButton.remove();
@@ -171,6 +177,7 @@ function creatInput(val, el) {
     type: 'text',
     name: val,
     placeholder: 'Numbers Only',
+    inputmode: 'numeric',
   });
   const removeButton = createElementWithClasses(
     'button',
@@ -187,6 +194,7 @@ function creatInput(val, el) {
   label.after(input), input.after(removeButton);
   addNewItemInputField.value = '';
   validation(input);
+  formatValue(input.value);
   deleteInput(removeButton);
   return input;
 }
@@ -201,32 +209,42 @@ const formatValue = (val) => {
 };
 
 // Функция для валидации ввода
+// const validation = (el) => {
+//   el.addEventListener('blur', (e) => {
+//     let inputVal = e.target.value;
+//     let val = Number(inputVal);
+//     const n = e.target.closest('.input-set');
+//     let errorContainer = n.querySelector('.error-container');
+//     const sibling = e.target.nextElementSibling;
+//     if (isNaN(val) && val !== 0) {
+//       if (!errorContainer) {
+//         let errorDiv = createErrorContainer('Please enter numbers only');
+//         e.target.nextElementSibling.after(errorDiv);
+//         e.target.classList.add('validation-error');
+//         e.target.value = '';
+//       } else if (errorContainer) {
+//         e.target.value = '';
+//         return;
+//       }
+//     } else if (!isNaN(val) && val !== 0) {
+//       const newVal = formatValue(val);
+//       console.log(newVal);
+//       e.target.value = newVal;
+//       e.target.classList.remove('validation-error');
+//       if (errorContainer) {
+//         errorContainer.remove();
+//       }
+//     }
+//   });
+// };
+
 const validation = (el) => {
-  el.addEventListener('blur', (e) => {
-    let inputVal = e.target.value;
-    let val = Number(inputVal);
-    const n = e.target.closest('.input-set');
-    let t = n.querySelector('.error-container');
-    const sibling = e.target.nextElementSibling;
-    if (isNaN(val) && val !== 0) {
-      if (!t) {
-        let errorDiv = createErrorContainer('Please enter numbers only');
-        e.target.nextElementSibling.after(errorDiv);
-        e.target.classList.add('validation-error');
-        e.target.value = '';
-      } else if (t) {
-        e.target.value = '';
-        return;
-      }
-    } else if (!isNaN(val) && val !== 0) {
-      const newVal = formatValue(val);
-      console.log(newVal);
-      e.target.value = newVal;
-      e.target.classList.remove('validation-error');
-      if (t) {
-        t.remove();
-      }
-    }
+  el.addEventListener('input', function (event) {
+    let inputValue = event.target.value;
+    console.log(typeof inputValue);
+    // Remove non-numeric characters using a regular expression
+    var numericValue = inputValue.replace(/\D/g, '');
+    event.target.value = numericValue;
   });
 };
 
@@ -285,80 +303,33 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       });
+
+      //Inputs value validation
+      document
+        .querySelectorAll('.input-set input:not(.add-new-item)')
+        .forEach((el) => {
+          validation(el);
+          el.addEventListener('blur', (e) => {
+            if (e.target.value && e.target.value.indexOf('$') === -1) {
+              e.target.value = formatValue(+e.target.value);
+            }
+          });
+        });
     }
   };
   xhttp.open('GET', 'js/data.json', true);
   xhttp.send();
 });
 
-// Функция для обработки клика на кнопку calculate
-
-// document.getElementById('calculate').addEventListener('click', (e) => {
-//   e.preventDefault();
-//   console.log('working');
-//   let arrValues = [];
-//   let arrKeys = [];
-//   const r = document.querySelectorAll('.input-set input:not(.add-new-item)');
-//   Array.from(r).forEach((el) => {
-//     let value = el.value;
-//     if (value) {
-//       let r = +value
-//         .split('')
-//         .filter((el) => el !== '$' && el !== ',')
-//         .join('');
-//       arrValues.push(r);
-//       const id = el.id;
-//       arrKeys.push(id);
-//     }
-//   });
-//   console.log(arrKeys, arrValues);
-//   let sum = 0;
-//   sum = arrValues.reduce((acc, curn) => acc + curn, 0);
-//   document.getElementById('sum').innerText = formatValue(sum);
-//   const a = creteateChart(arrValues, arrKeys);
-//   const ctx = document.getElementById('myChart');
-//   if (ctx.style) {
-//     a.destroy();
-//   }
-//   arrValues = [];
-//   arrKeys = [];
-//   //
-// });
-
-// function creteateChart(values, key) {
-//   const ctx = document.getElementById('myChart');
-//   const myChart = new Chart(ctx, {
-//     type: 'pie',
-//     data: {
-//       labels: key,
-//       datasets: [
-//         {
-//           label: '$',
-//           data: values,
-//           borderWidth: 1,
-//         },
-//       ],
-//     },
-//     options: {
-//       responsive: true,
-//       plugins: {
-//         legend: {
-//           position: 'bottom',
-//         },
-//         title: {
-//           display: true,
-//           text: 'Your montly budget',
-//         },
-//       },
-//     },
-//   });
-//   return myChart;
-// }
 let myChart = null;
 
 document.getElementById('calculate').addEventListener('click', (e) => {
   e.preventDefault();
   console.log('working');
+  const divCharts = document.getElementById('charts');
+  if (window.innerWidth < 800) {
+    divCharts.scrollIntoView({ behavior: 'smooth' });
+  }
 
   // Destroy previous chart if exists
   if (myChart) {
