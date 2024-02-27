@@ -5,11 +5,11 @@
       "items": [
         {
           "id": "mortgage",
-          "labelName": "Mortgage Patment"
+          "labelName": "Mortgage Payment"
         },
         {
           "id": "hoa",
-          "labelName": "HOA Patment"
+          "labelName": "HOA Payment"
         },
         {
           "id": "car-lease",
@@ -17,15 +17,15 @@
         },
         {
           "id": "car-insurance",
-          "labelName": "car insurancet Patment"
+          "labelName": "Car Insurance Payment"
         },
         {
           "id": "day-care",
-          "labelName": "day care Payment"
+          "labelName": "Daycare Payment"
         },
         {
-          "id": "add-essentil",
-          "labelName": "add essentil Patment"
+          "id": "add-essential",
+          "labelName": "Add Essential Payment"
         }
       ]
     },
@@ -34,27 +34,27 @@
       "items": [
         {
           "id": "electricity",
-          "labelName": "electricity Patment"
+          "labelName": "Electricity Payment"
         },
         {
           "id": "gas",
-          "labelName": "gas Patment"
+          "labelName": "Gas Payment"
         },
         {
           "id": "water",
-          "labelName": "water Payment"
+          "labelName": "Water Payment"
         },
         {
           "id": "internet",
-          "labelName": "internet Patment"
+          "labelName": "Internet Payment"
         },
         {
           "id": "mobile-phone",
-          "labelName": "mobile phone Patment"
+          "labelName": "Mobile Phone Payment"
         },
         {
-          "id": "add-utilitie",
-          "labelName": "add utilitie Patment"
+          "id": "add-utility",
+          "labelName": "Add Utility Payment"
         }
       ]
     },
@@ -63,19 +63,19 @@
       "items": [
         {
           "id": "groceries",
-          "labelName": "groceries"
+          "labelName": "Groceries"
         },
         {
-          "id": "entertainments",
-          "labelName": "entertainments"
+          "id": "entertainment",
+          "labelName": "Entertainment"
         },
         {
           "id": "eating-out",
-          "labelName": "eating out"
+          "labelName": "Eating out"
         },
         {
           "id": "gym",
-          "labelName": "gym"
+          "labelName": "Gym"
         },
         {
           "id": "miscellaneous",
@@ -83,7 +83,7 @@
         },
         {
           "id": "add-other",
-          "labelName": "add other Patment"
+          "labelName": "Add Other Payment"
         }
       ]
     }
