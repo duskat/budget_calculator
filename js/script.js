@@ -93,7 +93,7 @@ const createForm = (data) => {
         setAttributes(input, {
           type: 'text',
           class: 'add-new-item',
-          placeholder: 'Please entre the payment',
+          placeholder: 'Please enter the payment amount.',
           id: item.id,
           name: item.id,
           inputmode: 'text',
@@ -274,7 +274,9 @@ document.addEventListener('DOMContentLoaded', () => {
           const addInputValue = e.target.previousElementSibling;
           const val = addInputValue.value;
           const nextElTarget = e.target.nextElementSibling;
-          const errorDiv = createErrorContainer('Please enter some values');
+          const errorDiv = createErrorContainer(
+            'Please enter value for the field.'
+          );
           // if (val && !nextElTarget) {
           //   creatInput(val, e.target);
           // } else if (!val && !nextElTarget) {
