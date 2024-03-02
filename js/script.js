@@ -31,10 +31,16 @@ function toCamelCase(value) {
 // Создание HTML-структуры на основе данных
 const createForm = (data) => {
   const form = document.querySelector('form');
-  data.forEach((section) => {
+  data.forEach((section, i) => {
+    let classNmae;
+    if (i === 0) {
+      classNmae = `slide section section_${section.sectionName} active`;
+    } else {
+      classNmae = `slide section section_${section.sectionName}`;
+    }
     const fieldset = createElementWithClasses(
       'fieldset',
-      `section section_${section.sectionName}`,
+      classNmae,
       section.sectionName
     );
     form.appendChild(fieldset);
@@ -248,6 +254,58 @@ const validation = (el) => {
   });
 };
 
+//
+
+const buildSlider = (slides) => {
+  const nextBtn = document.getElementById('next');
+  const previousBtn = document.getElementById('previous');
+  const progressBar = document.getElementById('progress-bar');
+  const totalIncomInput = document.getElementById('your-income');
+  const totalIncomeContainer = document.querySelector('#total-income');
+  const totalIncomeSpan = document.querySelector('#total-income-value');
+
+  let currentIndex = 0;
+
+  function showSlides(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === index);
+      updateProgressBar();
+    });
+  }
+
+  function updateProgressBar() {
+    const percent = ((currentIndex + 1) / slides.length) * 100;
+    progressBar.style.width = percent + '%';
+  }
+
+  nextBtn.addEventListener('click', () => {
+    const totalSectionExpenses = document.querySelectorAll(
+      'fieldset.active input'
+    );
+    console.log(totalSectionExpenses);
+    totalIncomeSpan.innerText = totalIncomInput.value;
+    currentIndex = (currentIndex + 1) % slides.length;
+    showSlides(currentIndex);
+    previousBtn.disabled = false;
+    if (currentIndex + 1 === slides.length) {
+      nextBtn.disabled = true;
+    }
+  });
+
+  previousBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+    showSlides(currentIndex);
+    if (currentIndex + 1 === slides.length - 1) {
+      nextBtn.disabled = false;
+    }
+    if (currentIndex === 0) {
+      previousBtn.disabled = true;
+    }
+  });
+
+  showSlides(currentIndex);
+};
+
 // Вызываем функцию createForm с вашими данными initData
 document.addEventListener('DOMContentLoaded', () => {
   const xhttp = new XMLHttpRequest();
@@ -317,6 +375,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           });
         });
+
+      //build slider and progress bar
+      buildSlider(document.querySelectorAll('.slide'));
     }
   };
   xhttp.open('GET', 'js/data.json', true);

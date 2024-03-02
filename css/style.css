@@ -8,16 +8,19 @@
 body {
   background-color: #edf2f5;
   color: #52504f;
-  font-family: "Roboto", sans-serif;
-  max-width: 1020px;
+  font-family: "Open Sans", sans-serif;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 main {
   display: flex;
   padding: 5px;
-
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
+
+
 
 @media screen and (max-width: 800px) {
   main {
@@ -29,9 +32,26 @@ main {
     font-size: 30px !important;
   }
 
-  section {
+  section,
+  #navigation {
+    width: 95% !important;
+  }
 
-    width: 100% !important;
+  #form {
+    order: 1;
+  }
+
+  #navigation {
+    order: 2
+  }
+
+  .navigation-btn {
+    justify-content: space-between !important;
+  }
+
+
+  #charts {
+    order: 3
   }
 }
 
@@ -62,14 +82,14 @@ button {
   float: right;
 }
 
-button#calculate {
+button.prime-btn {
   font-weight: 300;
   font-size: 25px;
   background: #49c1a2;
   width: 100%;
   margin: 0;
   padding: 15px;
-  opacity: 0.8;
+  opacity: 0.9;
   border: 2px solid lightgray;
   border-radius: 10px;
   color: white;
@@ -77,17 +97,31 @@ button#calculate {
   box-shadow: -3px 0px 8px 0 rgb(0 0 0 / 0%), 0px 0px 9px 0 rgba(0, 0, 0, 0.19);
 }
 
-#calculate:hover {
+.prime-btn:hover {
   opacity: 1;
 }
 
-fieldset {
+.prime-btn:disabled {
+  opacity: 0.5;
+}
+
+
+.section {
   padding: 20px;
   background-color: white;
   border: 1px lightgray solid;
   border-radius: 5px;
   margin-bottom: 20px;
   box-shadow: -3px 0px 8px 0 rgb(0 0 0 / 0%), 0px 0px 9px 0 rgba(0, 0, 0, 0.19);
+
+}
+
+.slide {
+  display: none;
+}
+
+.active {
+  display: block;
 }
 
 h1 {
@@ -103,6 +137,11 @@ h2 {
   font-size: 30px;
 }
 
+p {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
 div.collapse {
   float: right;
   font-size: 30px;
@@ -115,8 +154,8 @@ div.collapse:hover {
 }
 
 #myChart {
-  height: 100% !important;
-  width: 100% !important;
+  height: 80% !important;
+  width: 80% !important;
 }
 
 .sticky {
@@ -124,17 +163,6 @@ div.collapse:hover {
   top: 0;
 }
 
-div#total {
-  margin: 0 0 20px 0;
-  padding: 20px;
-  background-color: white;
-  border: 2px lightgray solid;
-  border-radius: 5px;
-  margin-bottom: 20px;
-  box-shadow: -3px 0px 8px 0 rgb(0 0 0 / 0%), 0px 0px 9px 0 rgba(0, 0, 0, 0.19);
-  font-weight: 300;
-  width: 100%;
-}
 
 input {
   min-width: 83%;
@@ -148,8 +176,8 @@ input {
 
 input:focus {
   outline: none !important;
-  border-color: #719ece;
-  box-shadow: 0 0 5px #719ece;
+  border-color: #49c1a2;
+  box-shadow: 0 0 5px #49c1a2;
 }
 
 input::placeholder {
@@ -159,6 +187,10 @@ input::placeholder {
 
 .inputs-group {
   transition: opacity linear 1s, width linear 1s;
+}
+
+#your-income {
+  width: 100%;
 }
 
 .add-new-item {
@@ -209,6 +241,34 @@ canvas {
 
 .hide {
   display: none;
+}
+
+#navigation {
+  width: 100%;
+}
+
+.navigation-btn {
+  justify-content: space-around;
+  display: flex;
+}
+
+.navigation-btn button {
+  max-width: 200px;
+  margin: 0 0 20px;
+  flex: 1;
+}
+
+#progress-bar {
+  width: 0%;
+  height: 25px;
+  background-color: #49c1a2;
+  margin-bottom: 20px;
+  border-radius: 10em;
+}
+
+.progress-bar-container {
+  background: white;
+  border-radius: 10em;
 }
 
 .validation-error {

@@ -24,22 +24,46 @@
     <span class="fa-solid fa-calculator"></span>
     <h1>Budget Calculator</h1>
   </header>
+
   <main>
+    <div id="navigation">
+      <div class="progress-bar-container">
+        <div id="progress-bar"></div>
+      </div>
+      <div class="navigation-btn">
+        <button id="previous" class="prime-btn" disabled>Previous</button>
+        <button id="next" class="prime-btn">Next</button>
+      </div>
+    </div>
     <section id="form">
       <form>
-        <button id="calculate" type="submit" class="sticky">CALCULATE</button>
+        <div class="slide content section">
+          <h2>Your Monthly Income</h2>
+          <p>Please enter total monthly income, including salary, tips, dividends, and other sources of income.</p>
+          <span class="input-set">
+            <label for="your income">Your income</label>
+            <input type="text" placeholder="Numbers Only" id="your-income" name="your income"
+              autocomplete="one-time-code" inputmode="numeric">
+          </span>
+
+        </div>
       </form>
     </section>
+
     <section id="charts">
       <div class="sticky">
-
-        <div id="total">Your total montly expansex: <span id="sum">$0.00</span></div>
+        <div id="total-income" class="section">Your total monthly income: <span id="total-income-value">$0.00</span>
+        </div>
+        <div id="total-expansex" class="section">Your total montly expansex: <span id="sum">$0.00</span></div>
+        <button id="calculate" type="submit" class="sticky prime-btn">CALCULATE</button>
         <div id="total-chart">
           <canvas id="myChart"></canvas>
         </div>
       </div>
     </section>
+
   </main>
+
 </body>
 
 </html>
