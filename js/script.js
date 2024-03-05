@@ -68,14 +68,14 @@ const createForm = (data) => {
       const input = document.createElement('input');
       setAttributes(input, {
         type: 'text',
-        placeholder: 'Numbers Only',
+        placeholder: 'Please enter numbers only',
         id: item.id,
         name: item.id,
         autocomplete: 'one-time-code',
         inputmode: 'numeric',
       });
 
-      const inputsSet = createElementWithClasses('span', 'input-set');
+      const inputsSet = createElementWithClasses('div', 'input-set');
 
       const addButton = createElementWithClasses(
         'button',
@@ -99,7 +99,7 @@ const createForm = (data) => {
         setAttributes(input, {
           type: 'text',
           class: 'add-new-item',
-          placeholder: 'Please enter the payment amount.',
+          placeholder: 'Please enter the payment name',
           id: item.id,
           name: item.id,
           inputmode: 'text',
@@ -200,7 +200,6 @@ function creatInput(val, el) {
   label.after(input), input.after(removeButton);
   addNewItemInputField.value = '';
   validation(input);
-  formatValue(input.value);
   deleteInput(removeButton);
   return input;
 }
@@ -210,6 +209,8 @@ const formatValue = (val) => {
   let newVal = new Intl.NumberFormat('en', {
     style: 'currency',
     currency: 'USD',
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
   }).format(val);
   return newVal;
 };
@@ -245,7 +246,13 @@ const formatValue = (val) => {
 // };
 
 const validation = (el) => {
+  el.addEventListener('blur', (e) => {
+    if (e.target.value && e.target.value.indexOf('$') === -1) {
+      e.target.value = formatValue(+e.target.value);
+    }
+  });
   el.addEventListener('input', function (event) {
+    formatValue(+event.target.value);
     let inputValue = event.target.value;
     console.log(typeof inputValue);
     // Remove non-numeric characters using a regular expression
@@ -263,8 +270,13 @@ const buildSlider = (slides) => {
   const totalIncomInput = document.getElementById('your-income');
   const totalIncomeContainer = document.querySelector('#total-income');
   const totalIncomeSpan = document.querySelector('#total-income-value');
+  const currentStep = document.getElementById('current-step');
+  const lastStep = document.getElementById('last-step');
 
   let currentIndex = 0;
+
+  currentStep.innerText = currentIndex + 1;
+  lastStep.innerText = slides.length;
 
   function showSlides(index) {
     slides.forEach((slide, i) => {
@@ -277,11 +289,25 @@ const buildSlider = (slides) => {
     const percent = ((currentIndex + 1) / slides.length) * 100;
     progressBar.style.width = percent + '%';
   }
+  let isErrorDiv;
+  nextBtn.addEventListener('click', (e) => {
+    const errorDiv = createErrorContainer('Please enter your montly income.');
+    if (!totalIncomInput.value && !isErrorDiv) {
+      totalIncomInput.after(errorDiv);
+      isErrorDiv = true;
+      return;
+    } else if (!totalIncomInput.value && isErrorDiv) {
+      return;
+    } else if (totalIncomInput.value && isErrorDiv) {
+      const elToRemove = e.target.closest('.input-set');
+      elToRemove.querySelector('.error-container').remove();
+    }
 
-  nextBtn.addEventListener('click', () => {
     const totalSectionExpenses = document.querySelectorAll(
       'fieldset.active input'
     );
+    currentStep.innerText = currentIndex + 2;
+
     console.log(totalSectionExpenses);
     totalIncomeSpan.innerText = totalIncomInput.value;
     currentIndex = (currentIndex + 1) % slides.length;
@@ -295,6 +321,7 @@ const buildSlider = (slides) => {
   previousBtn.addEventListener('click', () => {
     currentIndex = (currentIndex - 1 + slides.length) % slides.length;
     showSlides(currentIndex);
+    currentStep.innerText = currentIndex + 1;
     if (currentIndex + 1 === slides.length - 1) {
       nextBtn.disabled = false;
     }
@@ -369,11 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .querySelectorAll('.input-set input:not(.add-new-item)')
         .forEach((el) => {
           validation(el);
-          el.addEventListener('blur', (e) => {
-            if (e.target.value && e.target.value.indexOf('$') === -1) {
-              e.target.value = formatValue(+e.target.value);
-            }
-          });
         });
 
       //build slider and progress bar
@@ -388,11 +410,6 @@ let myChart = null;
 
 document.getElementById('calculate').addEventListener('click', (e) => {
   e.preventDefault();
-  console.log('working');
-  const divCharts = document.getElementById('charts');
-  if (window.innerWidth < 800) {
-    divCharts.scrollIntoView({ behavior: 'smooth' });
-  }
 
   // Destroy previous chart if exists
   if (myChart) {
@@ -405,7 +422,7 @@ document.getElementById('calculate').addEventListener('click', (e) => {
 
   // Collect input values
   const inputs = document.querySelectorAll(
-    '.input-set input:not(.add-new-item)'
+    '.input-set input:not(.add-new-item #your-income)'
   );
   inputs.forEach((el) => {
     const value = el.value.replace(/[$,]/g, ''); // Remove '$' and ',' from input values
