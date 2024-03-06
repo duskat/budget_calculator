@@ -272,7 +272,12 @@ const buildSlider = (slides) => {
   const totalIncomeSpan = document.querySelector('#total-income-value');
   const currentStep = document.getElementById('current-step');
   const lastStep = document.getElementById('last-step');
-
+  const tatalEssentials = document.getElementById('tatal-essentials');
+  const tatalUtilities = document.getElementById('tatal-utilities');
+  const tatalOthers = document.getElementById('tatal-others');
+  const calculate = document.getElementById('calculate');
+  let total = 0;
+  let isErrorDiv;
   let currentIndex = 0;
 
   currentStep.innerText = currentIndex + 1;
@@ -289,7 +294,7 @@ const buildSlider = (slides) => {
     const percent = ((currentIndex + 1) / slides.length) * 100;
     progressBar.style.width = percent + '%';
   }
-  let isErrorDiv;
+
   nextBtn.addEventListener('click', (e) => {
     const errorDiv = createErrorContainer('Please enter your montly income.');
     if (!totalIncomInput.value && !isErrorDiv) {
@@ -299,22 +304,47 @@ const buildSlider = (slides) => {
     } else if (!totalIncomInput.value && isErrorDiv) {
       return;
     } else if (totalIncomInput.value && isErrorDiv) {
-      const elToRemove = e.target.closest('.input-set');
-      elToRemove.querySelector('.error-container').remove();
+      let elToRemove = document
+        .querySelector('.content')
+        .querySelector('.error-container');
+      if (elToRemove) {
+        elToRemove.remove();
+      }
     }
 
     const totalSectionExpenses = document.querySelectorAll(
       'fieldset.active input'
     );
+    const inputs = document.querySelectorAll(
+      '.input-set input:not(.add-new-item, #your-income)'
+    );
+    // Initialize variables
+    let arrValues = [];
+    let arrKeys = [];
+    // Collect input values
+    inputs.forEach((el) => {
+      const value = el.value.replace(/[$,]/g, ''); // Remove '$' and ',' from input values
+      if (value) {
+        arrValues.push(+value); // Convert to number and push to values array
+        arrKeys.push(el.id); // Push ID to keys array
+      }
+    });
+    const sum = arrValues.reduce((acc, cur) => acc + cur, 0);
+    total += sum;
+    console.log(total);
+    document.getElementById('sum').innerText = formatValue(total);
+
     currentStep.innerText = currentIndex + 2;
 
     console.log(totalSectionExpenses);
     totalIncomeSpan.innerText = totalIncomInput.value;
     currentIndex = (currentIndex + 1) % slides.length;
     showSlides(currentIndex);
+
     previousBtn.disabled = false;
     if (currentIndex + 1 === slides.length) {
-      nextBtn.disabled = true;
+      nextBtn.classList.add('hide');
+      calculate.classList.remove('hide');
     }
   });
 
@@ -323,7 +353,8 @@ const buildSlider = (slides) => {
     showSlides(currentIndex);
     currentStep.innerText = currentIndex + 1;
     if (currentIndex + 1 === slides.length - 1) {
-      nextBtn.disabled = false;
+      nextBtn.classList.remove('hide');
+      calculate.classList.add('hide');
     }
     if (currentIndex === 0) {
       previousBtn.disabled = true;
@@ -338,8 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
-      initData = JSON.parse(xhttp.responseText).data; // Исправлено: initData.data
-      // console.log(initData);
+      initData = JSON.parse(xhttp.responseText).data;
       createForm(initData);
 
       // Добавляем обработчики событий на кнопки сворачивания
@@ -407,7 +437,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let myChart = null;
-
 document.getElementById('calculate').addEventListener('click', (e) => {
   e.preventDefault();
 
@@ -422,17 +451,25 @@ document.getElementById('calculate').addEventListener('click', (e) => {
 
   // Collect input values
   const inputs = document.querySelectorAll(
-    '.input-set input:not(.add-new-item #your-income)'
+    '.input-set input:not(.add-new-item, #your-income)'
   );
   inputs.forEach((el) => {
     const value = el.value.replace(/[$,]/g, ''); // Remove '$' and ',' from input values
-    if (value) {
+    if (value && value != 0) {
       arrValues.push(+value); // Convert to number and push to values array
       arrKeys.push(el.id); // Push ID to keys array
     }
   });
 
   // Create new chart
+  createNewChart(arrValues, arrKeys);
+
+  // Display sum
+  const sum = arrValues.reduce((acc, cur) => acc + cur, 0);
+  document.getElementById('sum').innerText = formatValue(sum);
+});
+
+function createNewChart(arrValues, arrKeys) {
   const ctx = document.getElementById('myChart');
   myChart = new Chart(ctx, {
     type: 'pie',
@@ -459,10 +496,6 @@ document.getElementById('calculate').addEventListener('click', (e) => {
       },
     },
   });
-
-  // Display sum
-  const sum = arrValues.reduce((acc, cur) => acc + cur, 0);
-  document.getElementById('sum').innerText = formatValue(sum);
-});
+}
 
 //END
