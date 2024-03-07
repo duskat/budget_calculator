@@ -348,6 +348,7 @@ header svg {
 
 .data-container div {
   font-size: 14px;
+  font-style: italic;
 }
 
 div[data-name] {
