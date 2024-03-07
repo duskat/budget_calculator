@@ -87,6 +87,11 @@ section {
   width: 50%;
 }
 
+.flex-box {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 button {
   width: 40px;
   font-size: 30px;
@@ -324,4 +329,24 @@ header svg {
 .heading-steps span {
   font-weight: 300;
   font-size: 24px;
+}
+
+#expenses-breakpoints {
+  margin-top: 10px;
+  margin-left: 20px;
+  line-height: 1.8em;
+}
+
+#total-expenses {
+  line-height: 1.8em;
+
+}
+
+.data-container {
+  width: 100%;
+  margin-left: 15px;
+}
+
+div[data-name] {
+  width: 280px;
 }

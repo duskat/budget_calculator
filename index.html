@@ -46,8 +46,8 @@
       </div>
       <div class="navigation-btn">
         <button id="previous" class="prime-btn" disabled>Previous</button>
-        <button id="next" class="prime-btn">Next</button>
-        <button id="calculate" type="submit" class="prime-btn hide">Calculate</button>
+        <button id="next" class="prime-btn calculate">Next</button>
+        <button id="calculate" type="submit" class="prime-btn calculate hide">Calculate</button>
       </div>
     </div>
     <section id="form">
@@ -71,17 +71,13 @@
     </section>
 
     <section id="charts">
-      <div class="sticky">
-        <div id="total-income" class="section">Your total monthly income: <span id="total-income-value">$0.00</span>
-        </div>
-        <div id="total-expansex" class="section">Your total montly expansex: <span id="sum">$0.00</span></div>
-        <div id="tatal-essentials"></div>
-        <div id="tatal-utilities"></div>
-        <div id="tatal-others"></div>
-
-        <div id="total-chart">
-          <canvas id="myChart"></canvas>
-        </div>
+      <div id="total-income" class="section">Your total monthly income: <span id="total-income-value">$0.00</span>
+      </div>
+      <div id="total-expenses" class="section">Your total monthly expenses: <span id="sum">$0.00</span>
+        <div id="expenses-breakpoints"></div>
+      </div>
+      <div id="total-chart">
+        <canvas id="myChart"></canvas>
       </div>
     </section>
 

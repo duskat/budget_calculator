@@ -32,15 +32,15 @@ function toCamelCase(value) {
 const createForm = (data) => {
   const form = document.querySelector('form');
   data.forEach((section, i) => {
-    let classNmae;
+    let className;
     if (i === 0) {
-      classNmae = `slide section section_${section.sectionName} active`;
+      className = `slide section section_${section.sectionName} active`;
     } else {
-      classNmae = `slide section section_${section.sectionName}`;
+      className = `slide section section_${section.sectionName}`;
     }
     const fieldset = createElementWithClasses(
       'fieldset',
-      classNmae,
+      className,
       section.sectionName
     );
     form.appendChild(fieldset);
@@ -73,6 +73,7 @@ const createForm = (data) => {
         name: item.id,
         autocomplete: 'one-time-code',
         inputmode: 'numeric',
+        'data-inputLabeName': item.labelName,
       });
 
       const inputsSet = createElementWithClasses('div', 'input-set');
@@ -184,6 +185,7 @@ function creatInput(val, el) {
     name: val,
     placeholder: 'Numbers Only',
     inputmode: 'numeric',
+    'data-inputLabeName': toCamelCase(val),
   });
   const removeButton = createElementWithClasses(
     'button',
@@ -215,36 +217,6 @@ const formatValue = (val) => {
   return newVal;
 };
 
-// Функция для валидации ввода
-// const validation = (el) => {
-//   el.addEventListener('blur', (e) => {
-//     let inputVal = e.target.value;
-//     let val = Number(inputVal);
-//     const n = e.target.closest('.input-set');
-//     let errorContainer = n.querySelector('.error-container');
-//     const sibling = e.target.nextElementSibling;
-//     if (isNaN(val) && val !== 0) {
-//       if (!errorContainer) {
-//         let errorDiv = createErrorContainer('Please enter numbers only');
-//         e.target.nextElementSibling.after(errorDiv);
-//         e.target.classList.add('validation-error');
-//         e.target.value = '';
-//       } else if (errorContainer) {
-//         e.target.value = '';
-//         return;
-//       }
-//     } else if (!isNaN(val) && val !== 0) {
-//       const newVal = formatValue(val);
-//       console.log(newVal);
-//       e.target.value = newVal;
-//       e.target.classList.remove('validation-error');
-//       if (errorContainer) {
-//         errorContainer.remove();
-//       }
-//     }
-//   });
-// };
-
 const validation = (el) => {
   el.addEventListener('blur', (e) => {
     if (e.target.value && e.target.value.indexOf('$') === -1) {
@@ -272,13 +244,15 @@ const buildSlider = (slides) => {
   const totalIncomeSpan = document.querySelector('#total-income-value');
   const currentStep = document.getElementById('current-step');
   const lastStep = document.getElementById('last-step');
-  const tatalEssentials = document.getElementById('tatal-essentials');
-  const tatalUtilities = document.getElementById('tatal-utilities');
-  const tatalOthers = document.getElementById('tatal-others');
   const calculate = document.getElementById('calculate');
-  let total = 0;
+
   let isErrorDiv;
   let currentIndex = 0;
+
+  const inputs = document.querySelectorAll(
+    'fieldset.active input:not(.add-new-item)'
+  );
+  const inputsValues = getInputsValues(inputs);
 
   currentStep.innerText = currentIndex + 1;
   lastStep.innerText = slides.length;
@@ -295,48 +269,101 @@ const buildSlider = (slides) => {
     progressBar.style.width = percent + '%';
   }
 
+  const calcBtns = document.querySelectorAll('.calculate');
+  calcBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const currentSlide = slides[currentIndex];
+
+      if (currentSlide.tagName.toLowerCase() === 'fieldset') {
+        const slideInputs = currentSlide.querySelectorAll(
+          'input:not(.add-new-item)'
+        );
+        const allInputs = getInputsValues(
+          document.querySelectorAll('fieldset input:not(.add-new-item)')
+        );
+
+        const currentSlideHeading = currentSlide.querySelector('h2');
+        const id = currentSlideHeading.textContent.trim().toLowerCase();
+        let sectionSum;
+        let newEl;
+        let totalSum;
+
+        const expensesBreakpoints = document.getElementById(
+          'expenses-breakpoints'
+        );
+        let dataSelector = expensesBreakpoints.querySelector(
+          `[data-name='${id}']`
+        );
+
+        let arr = getInputsValues(slideInputs);
+        sectionSum = arr.reduce((acc, obj) => acc + obj.value, 0);
+        totalSum = allInputs.reduce((acc, obj) => acc + obj.value, 0);
+        const totalExpensesText = `Total ${id} expenses: ${formatValue(
+          sectionSum
+        )}`;
+        document.getElementById('sum').innerText = formatValue(totalSum);
+        const collapseContainer = createElementWithClasses(
+          'div',
+          'collapse fa-solid fa-caret-down'
+        );
+        const dataContainer = createElementWithClasses('div', 'data-container');
+
+        const content = arr
+          .map((obj) => `<div>${obj.key}: ${formatValue(obj.value)}</div>`)
+          .join('');
+
+        dataContainer.innerHTML = content;
+        if (!dataSelector) {
+          let newFlexBox = createElementWithClasses(
+            'div',
+            `flex-box box-${id}`
+          );
+          newEl = createElementWithClasses('div');
+          setAttributes(newEl, {
+            'data-name': id,
+          });
+          newEl.innerText = totalExpensesText;
+          expensesBreakpoints.appendChild(newFlexBox);
+          newFlexBox.appendChild(newEl);
+          if (sectionSum !== 0) {
+            newEl.after(collapseContainer);
+            collapseContainer.after(dataContainer);
+          }
+        } else {
+          dataSelector.innerText = totalExpensesText;
+          let updateDataContainer = document
+            .querySelector(`.box-${id}`)
+            .querySelector('.data-container');
+          if (updateDataContainer) {
+            updateDataContainer.innerHTML = content;
+          }
+        }
+        document.querySelectorAll('.collapse').forEach((el) => {
+          el.addEventListener('click', handleCollapseClick);
+        });
+      }
+    });
+  });
+
   nextBtn.addEventListener('click', (e) => {
-    const errorDiv = createErrorContainer('Please enter your montly income.');
-    if (!totalIncomInput.value && !isErrorDiv) {
-      totalIncomInput.after(errorDiv);
-      isErrorDiv = true;
+    const errorDiv = createErrorContainer('Please enter your monthly income.');
+    if (!totalIncomInput.value) {
+      if (!isErrorDiv) {
+        totalIncomInput.after(errorDiv);
+        isErrorDiv = true;
+      }
       return;
-    } else if (!totalIncomInput.value && isErrorDiv) {
-      return;
-    } else if (totalIncomInput.value && isErrorDiv) {
-      let elToRemove = document
-        .querySelector('.content')
-        .querySelector('.error-container');
+    }
+
+    if (isErrorDiv) {
+      let elToRemove = document.querySelector('.content .error-container');
       if (elToRemove) {
         elToRemove.remove();
+        isErrorDiv = false;
       }
     }
 
-    const totalSectionExpenses = document.querySelectorAll(
-      'fieldset.active input'
-    );
-    const inputs = document.querySelectorAll(
-      '.input-set input:not(.add-new-item, #your-income)'
-    );
-    // Initialize variables
-    let arrValues = [];
-    let arrKeys = [];
-    // Collect input values
-    inputs.forEach((el) => {
-      const value = el.value.replace(/[$,]/g, ''); // Remove '$' and ',' from input values
-      if (value) {
-        arrValues.push(+value); // Convert to number and push to values array
-        arrKeys.push(el.id); // Push ID to keys array
-      }
-    });
-    const sum = arrValues.reduce((acc, cur) => acc + cur, 0);
-    total += sum;
-    console.log(total);
-    document.getElementById('sum').innerText = formatValue(total);
-
     currentStep.innerText = currentIndex + 2;
-
-    console.log(totalSectionExpenses);
     totalIncomeSpan.innerText = totalIncomInput.value;
     currentIndex = (currentIndex + 1) % slides.length;
     showSlides(currentIndex);
@@ -364,7 +391,7 @@ const buildSlider = (slides) => {
   showSlides(currentIndex);
 };
 
-// Вызываем функцию createForm с вашими данными initData
+// Call createForm function with initData
 document.addEventListener('DOMContentLoaded', () => {
   const xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function () {
@@ -392,19 +419,6 @@ document.addEventListener('DOMContentLoaded', () => {
           const errorDiv = createErrorContainer(
             'Please enter value for the field.'
           );
-          // if (val && !nextElTarget) {
-          //   creatInput(val, e.target);
-          // } else if (!val && !nextElTarget) {
-          //   e.target.after(errorDiv);
-          // } else if (!val && nextElTarget) {
-          //   nextElTarget.classList.remove('hide');
-          // } else if (val && !nextElTarget.classList.contains('hide')) {
-          //   nextElTarget.classList.add('hide');
-          //   creatInput(val, e.target);
-          // } else if (val && nextElTarget.classList.contains('hide')) {
-          //   creatInput(val, e.target);
-          // }
-
           if (!val) {
             if (!nextElTarget) {
               e.target.after(errorDiv);
@@ -444,41 +458,40 @@ document.getElementById('calculate').addEventListener('click', (e) => {
   if (myChart) {
     myChart.destroy();
   }
+  const inputs = document.querySelectorAll('fieldset input:not(.add-new-item)');
+  const inputsValues = getInputsValues(inputs);
+  // Create new chart
+  createNewChart(inputsValues);
 
-  // Initialize variables
-  let arrValues = [];
-  let arrKeys = [];
+  // Display sum
+  // const sum = inputsValues.reduce((acc, obj) => acc + obj.value, 0);
+  // document.getElementById('sum').innerText = formatValue(sum);
+});
 
-  // Collect input values
-  const inputs = document.querySelectorAll(
-    '.input-set input:not(.add-new-item, #your-income)'
-  );
+function getInputsValues(inputs) {
+  let arr = [];
   inputs.forEach((el) => {
     const value = el.value.replace(/[$,]/g, ''); // Remove '$' and ',' from input values
     if (value && value != 0) {
-      arrValues.push(+value); // Convert to number and push to values array
-      arrKeys.push(el.id); // Push ID to keys array
+      let obj = { key: el.dataset.inputlabename, value: +value };
+      arr.push(obj);
     }
   });
+  return arr;
+}
 
-  // Create new chart
-  createNewChart(arrValues, arrKeys);
-
-  // Display sum
-  const sum = arrValues.reduce((acc, cur) => acc + cur, 0);
-  document.getElementById('sum').innerText = formatValue(sum);
-});
-
-function createNewChart(arrValues, arrKeys) {
+function createNewChart(arr) {
+  const keysArray = arr.map((obj) => obj.key);
+  const valueArray = arr.map((obj) => obj.value);
   const ctx = document.getElementById('myChart');
   myChart = new Chart(ctx, {
     type: 'pie',
     data: {
-      labels: arrKeys,
+      labels: keysArray,
       datasets: [
         {
           label: '$',
-          data: arrValues,
+          data: valueArray,
           borderWidth: 1,
         },
       ],
