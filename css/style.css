@@ -178,9 +178,8 @@ div.collapse:hover {
   opacity: 1;
 }
 
-#myChart {
-  height: 80% !important;
-  width: 80% !important;
+#total-chart {
+  margin-bottom: 100px;
 }
 
 .sticky {
@@ -267,6 +266,8 @@ button.remove-btm:hover {
 
 canvas {
   margin: auto;
+  width: 90% !important;
+  height: 90% !important;
 }
 
 .hide {
@@ -344,6 +345,7 @@ header svg {
 
 .data-container {
   width: 100%;
+  margin-left: 25px;
 }
 
 .data-container div {

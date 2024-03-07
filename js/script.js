@@ -53,10 +53,10 @@ const createForm = (data) => {
       'div',
       'collapse fa-solid fa-caret-down'
     );
-    h2.after(collapseContainer);
+    // h2.after(collapseContainer);
 
     const gpoupingContainer = createElementWithClasses('div', 'inputs-group');
-    collapseContainer.after(gpoupingContainer);
+    h2.after(gpoupingContainer);
 
     section.items.forEach((item, index) => {
       const label = document.createElement('label');
@@ -252,7 +252,6 @@ const buildSlider = (slides) => {
   const inputs = document.querySelectorAll(
     'fieldset.active input:not(.add-new-item)'
   );
-  const inputsValues = getInputsValues(inputs);
 
   currentStep.innerText = currentIndex + 1;
   lastStep.innerText = slides.length;
@@ -306,22 +305,23 @@ const buildSlider = (slides) => {
           'div',
           'collapse fa-solid fa-caret-down'
         );
-        const dataContainer = createElementWithClasses('div', 'data-container');
+        const dataContainer = createElementWithClasses(
+          'div',
+          'data-container hide'
+        );
 
         const content = arr
           .map((obj) => `<div>${obj.key}: ${formatValue(obj.value)}</div>`)
           .join('');
 
         dataContainer.innerHTML = content;
+
+        newEl = createElementWithClasses('div');
+        setAttributes(newEl, {
+          'data-name': id,
+        });
+        let newFlexBox = createElementWithClasses('div', `flex-box box-${id}`);
         if (!dataSelector) {
-          let newFlexBox = createElementWithClasses(
-            'div',
-            `flex-box box-${id}`
-          );
-          newEl = createElementWithClasses('div');
-          setAttributes(newEl, {
-            'data-name': id,
-          });
           newEl.innerText = totalExpensesText;
           expensesBreakpoints.appendChild(newFlexBox);
           newFlexBox.appendChild(newEl);
@@ -331,9 +331,13 @@ const buildSlider = (slides) => {
           }
         } else {
           dataSelector.innerText = totalExpensesText;
-          let updateDataContainer = document
-            .querySelector(`.box-${id}`)
-            .querySelector('.data-container');
+          let dataBox = document.querySelector(`.box-${id}`);
+          let updateDataContainer = dataBox.querySelector('.data-container');
+          let calapseContainer = dataBox.querySelector('.collapse');
+          if (sectionSum !== 0 && !calapseContainer) {
+            dataSelector.after(collapseContainer);
+            collapseContainer.after(dataContainer);
+          }
           if (updateDataContainer) {
             updateDataContainer.innerHTML = content;
           }
@@ -362,6 +366,10 @@ const buildSlider = (slides) => {
         isErrorDiv = false;
       }
     }
+    const targetElement = document.querySelector('.active h2');
+    if (window.innerWidth <= 768) {
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     currentStep.innerText = currentIndex + 2;
     totalIncomeSpan.innerText = totalIncomInput.value;
@@ -385,6 +393,10 @@ const buildSlider = (slides) => {
     }
     if (currentIndex === 0) {
       previousBtn.disabled = true;
+    }
+    const targetElement = document.querySelector('.active h2');
+    if (window.innerWidth <= 768) {
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
 
@@ -453,6 +465,11 @@ document.addEventListener('DOMContentLoaded', () => {
 let myChart = null;
 document.getElementById('calculate').addEventListener('click', (e) => {
   e.preventDefault();
+
+  const targetElement = document.getElementById('charts');
+  if (window.innerWidth <= 768) {
+    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   // Destroy previous chart if exists
   if (myChart) {
