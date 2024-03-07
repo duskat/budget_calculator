@@ -333,7 +333,6 @@ header svg {
 
 #expenses-breakpoints {
   margin-top: 10px;
-  margin-left: 20px;
   line-height: 1.8em;
 }
 
@@ -344,9 +343,13 @@ header svg {
 
 .data-container {
   width: 100%;
-  margin-left: 15px;
+}
+
+.data-container div {
+  font-size: 14px;
 }
 
 div[data-name] {
   width: 280px;
+  font-size: 16px;
 }
