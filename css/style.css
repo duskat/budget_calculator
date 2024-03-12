@@ -2,7 +2,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-size: 18px;
 }
 
 body {
@@ -67,6 +66,12 @@ main {
   .heading-steps span {
     font-size: 18px !important;
   }
+
+  div#chart_div {
+    margin-bottom: 80px;
+    width: 95% !important;
+    height: 95% !important
+  }
 }
 
 header {
@@ -92,6 +97,15 @@ section {
   flex-wrap: wrap;
   margin-bottom: 10px;
 }
+
+.data-container .flex-box {
+  align-items: center;
+}
+
+.data-container .flex-box .color-inner {
+  margin-right: 10px;
+}
+
 
 button {
   width: 40px;
@@ -122,12 +136,31 @@ button.prime-btn {
 
 .prime-btn:hover {
   opacity: 1;
+
+  letter-spacing: 1px;
+  -webkit-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+  -moz-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+  box-shadow: 5px 40px -10px rgba(0, 0, 0, 0.57);
+  transition: all 0.4s ease 0s;
 }
 
 .prime-btn:disabled {
   opacity: 0.5;
 }
 
+#test-colors {
+  width: 500px;
+  height: 200px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.color-inner {
+  width: 15px;
+  height: 15px;
+  border: 1px solid grey;
+  border-radius: 50px
+}
 
 .section {
   padding: 20px;
@@ -159,6 +192,13 @@ h2 {
   display: inline-block;
   font-weight: 200;
   font-size: 30px;
+}
+
+h3 {
+  display: block;
+  font-weight: 200;
+  font-size: 25px;
+  text-align: center;
 }
 
 p {
@@ -196,6 +236,7 @@ input {
   border-radius: 3px;
   line-height: 2.5rem;
   color: #5b5a5a;
+  font-size: 16px;
 }
 
 input:focus {
@@ -271,7 +312,7 @@ canvas {
 }
 
 .hide {
-  display: none;
+  display: none !important;
 }
 
 #navigation {
@@ -356,4 +397,12 @@ header svg {
 div[data-name] {
   width: 280px;
   font-size: 16px;
+}
+
+div#chart_div {
+  text-align: center;
+}
+
+div[dir="ltr"] {
+  margin: auto;
 }

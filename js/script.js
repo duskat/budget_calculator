@@ -1,4 +1,6 @@
 let initData;
+let myChart = null;
+let dataArray = [];
 
 // Функция для создания элемента с заданным тегом, классами и идентификатором
 const createElementWithClasses = (tagName, classes, id) => {
@@ -28,9 +30,26 @@ function toCamelCase(value) {
   }
 }
 
+function generateWarmHexColor() {
+  // Генерация случайных значений для красного, зеленого и синего каналов
+  const red = Math.floor(Math.random() * 128 + 128); // От 128 до 255 (теплые оттенки красного)
+  const green = Math.floor(Math.random() * 128 + 128); // От 0 до 127 (зеленый канал в теплых оттенках)
+  const blue = Math.floor(Math.random() * 128 + 128); // От 0 до 127 (синий канал в теплых оттенках)
+
+  // Форматирование значений к шестнадцатеричному формату
+  const redHex = red.toString(16).padStart(2, '0'); // Преобразование в шестнадцатеричную строку
+  const greenHex = green.toString(16).padStart(2, '0');
+  const blueHex = blue.toString(16).padStart(2, '0');
+
+  // Сборка значения цвета в формате hexadecimal
+  const hexColor = `#${redHex}${greenHex}${blueHex}`;
+
+  return hexColor;
+}
+
 // Создание HTML-структуры на основе данных
 const createForm = (data) => {
-  const form = document.querySelector('form');
+  const form = document.querySelector('#form');
   data.forEach((section, i) => {
     let className;
     if (i === 0) {
@@ -49,10 +68,18 @@ const createForm = (data) => {
     h2.textContent = toCamelCase(section.sectionName);
     fieldset.appendChild(h2);
 
-    const collapseContainer = createElementWithClasses(
-      'div',
+    const collapseContainer = createCollapsibleBtn(
+      'button',
       'collapse fa-solid fa-caret-down'
     );
+
+    // const collapseContainer = createElementWithClasses(
+    //   'button',
+    //   'collapse fa-solid fa-caret-down'
+    // );
+    // setAttributes(collapseContainer, {
+    //   'aria-hidden': false,
+    // });
     // h2.after(collapseContainer);
 
     const gpoupingContainer = createElementWithClasses('div', 'inputs-group');
@@ -71,9 +98,11 @@ const createForm = (data) => {
         placeholder: 'Please enter numbers only',
         id: item.id,
         name: item.id,
+        maxlength: '5',
         autocomplete: 'one-time-code',
         inputmode: 'numeric',
         'data-inputLabeName': item.labelName,
+        'data-category': section.sectionName,
       });
 
       const inputsSet = createElementWithClasses('div', 'input-set');
@@ -100,6 +129,7 @@ const createForm = (data) => {
         setAttributes(input, {
           type: 'text',
           class: 'add-new-item',
+          maxlength: '50',
           placeholder: 'Please enter the payment name',
           id: item.id,
           name: item.id,
@@ -117,8 +147,19 @@ const createForm = (data) => {
 
 // Функция для обработки клика на кнопку сворачивания
 const handleCollapseClick = (e) => {
-  toggleCollapse(e.target);
-  toggleCaretIcon(e.target);
+  let isHidden;
+  const a = e.target.closest('.flex-box');
+  const b = a.querySelector('.data-container .flex-box');
+  if (b) {
+    toggleCollapse(e.target);
+    toggleCaretIcon(e.target);
+  } else if (!isHidden) {
+    e.target.classList.add('hide');
+    isHidden = true;
+  } else {
+    e.target.classList.remove('hide');
+    isHidden = false;
+  }
 };
 
 // Функция для обработки клика на кнопку calculate
@@ -140,6 +181,16 @@ const toggleCaretIcon = (target) => {
   );
 };
 
+//function to create collapsible element
+
+function createCollapsibleBtn(el, elClass) {
+  const collapseContainer = createElementWithClasses(el, elClass);
+  setAttributes(collapseContainer, {
+    'aria-hidden': false,
+  });
+  return collapseContainer;
+}
+
 // Функция для переключения состояния сворачивания
 const toggleCollapse = (target) => {
   target.nextElementSibling.classList.toggle('hide');
@@ -160,9 +211,72 @@ const deleteInput = (btm) => {
     ) {
       errorContainer.remove();
     }
+    const inputIndex = dataArray.findIndex(
+      (item) => item.inputId === elementId
+    );
+    if (inputIndex >= 0) {
+      dataArray.splice(inputIndex, 1);
+    }
     input.remove();
     label.remove();
     e.target.remove();
+  });
+};
+
+//Function to add a new input
+const addInput = (addBtns) => {
+  addBtns.forEach((btm) => {
+    btm.addEventListener('click', (e) => {
+      e.preventDefault();
+      const addInputValue = e.target.previousElementSibling;
+      const category = e.target
+        .closest('.active')
+        .querySelector('h2')
+        .innerText.toLowerCase();
+      const val = addInputValue.value;
+      const allInputLabelsName = document.querySelectorAll('.input-set label');
+      const errorContainer = e.target
+        .closest('.input-set')
+        .querySelector('.error-container');
+      if (errorContainer) {
+        errorContainer.remove();
+      }
+      let isNameExists = Array.from(allInputLabelsName).some((label) => {
+        const labelText = label.innerText.replace(' Payment', '');
+        return (
+          toCamelCase(labelText) === toCamelCase(val) ||
+          toCamelCase(label.innerText) === toCamelCase(val)
+        );
+      });
+      const nextElTarget = e.target.nextElementSibling;
+      const errorDivNoValue = createErrorContainer(
+        'Please enter value for the field.'
+      );
+      const errorDivNameExists = createErrorContainer(
+        'The field already exists.'
+      );
+      if (!val && !isNameExists) {
+        if (!nextElTarget) {
+          e.target.after(errorDivNoValue);
+        } else {
+          nextElTarget.classList.remove('hide');
+        }
+      } else if (val && isNameExists) {
+        if (!nextElTarget) {
+          e.target.after(errorDivNameExists);
+          addInputValue.value = '';
+        } else {
+          nextElTarget.classList.remove('hide');
+        }
+      } else {
+        if (nextElTarget) {
+          nextElTarget.classList.add('hide');
+        }
+        const newEl = creatInput(val, e.target, category);
+        newEl.focus();
+        createDataArray(newEl);
+      }
+    });
   });
 };
 
@@ -175,22 +289,28 @@ const createErrorContainer = (message) => {
 };
 
 //Function to add a new input field
-function creatInput(val, el) {
+function creatInput(val, el, category) {
   const label = document.createElement('label');
   val = val.trim();
   label.innerText = toCamelCase(val);
-  const input = createElementWithClasses('input', 'new-input-added', val);
+  const input = createElementWithClasses(
+    'input',
+    'new-input-added',
+    val.replace(/\s+/g, '-')
+  );
   setAttributes(input, {
     type: 'text',
     name: val,
     placeholder: 'Numbers Only',
     inputmode: 'numeric',
+    maxlength: '5',
     'data-inputLabeName': toCamelCase(val),
+    'data-category': category,
   });
   const removeButton = createElementWithClasses(
     'button',
     'remove-btm fa-solid fa-xmark',
-    `${val}-remove-btm`
+    `${val.replace(/\s+/g, '-')}-remove-btm`
   );
   const inputsSet = createElementWithClasses('span', 'input-set');
   const addNewItemInputField = el
@@ -233,8 +353,25 @@ const validation = (el) => {
   });
 };
 
-//
+//function to wait for elemtn to be presernt on the page
+function waitForElement(selector, timeout = 1000) {
+  return new Promise((resolve, reject) => {
+    const intervalId = setInterval(() => {
+      const element = document.querySelector(selector);
+      if (element) {
+        clearInterval(intervalId);
+        resolve(element);
+      }
+    }, 100);
 
+    setTimeout(() => {
+      clearInterval(intervalId);
+      reject(new Error(`Element ${selector} not found within ${timeout}ms`));
+    }, timeout);
+  });
+}
+
+//function to create slider
 const buildSlider = (slides) => {
   const nextBtn = document.getElementById('next');
   const previousBtn = document.getElementById('previous');
@@ -277,9 +414,6 @@ const buildSlider = (slides) => {
         const slideInputs = currentSlide.querySelectorAll(
           'input:not(.add-new-item)'
         );
-        const allInputs = getInputsValues(
-          document.querySelectorAll('fieldset input:not(.add-new-item)')
-        );
 
         const currentSlideHeading = currentSlide.querySelector('h2');
         const id = currentSlideHeading.textContent.trim().toLowerCase();
@@ -294,24 +428,39 @@ const buildSlider = (slides) => {
           `[data-name='${id}']`
         );
 
-        let arr = getInputsValues(slideInputs);
-        sectionSum = arr.reduce((acc, obj) => acc + obj.value, 0);
-        totalSum = allInputs.reduce((acc, obj) => acc + obj.value, 0);
+        sectionSum = dataArray
+          .filter((item) => item.category === id)
+          .reduce((acc, obj) => acc + obj.inputValue, 0);
+        totalSum = dataArray.reduce((acc, obj) => acc + obj.inputValue, 0);
         const totalExpensesText = `Total ${id} expenses: ${formatValue(
           sectionSum
         )}`;
         document.getElementById('sum').innerText = formatValue(totalSum);
-        const collapseContainer = createElementWithClasses(
-          'div',
+        const collapseContainer = createCollapsibleBtn(
+          'button',
           'collapse fa-solid fa-caret-down'
         );
+
+        // const collapseContainer = createElementWithClasses(
+        //   'div',
+        //   'collapse fa-solid fa-caret-down'
+        // );
         const dataContainer = createElementWithClasses(
           'div',
           'data-container hide'
         );
 
-        const content = arr
-          .map((obj) => `<div>${obj.key}: ${formatValue(obj.value)}</div>`)
+        const content = dataArray
+          .filter((item) => item.category === id)
+          .map(
+            (item) =>
+              `<div class='flex-box'>
+              <div class="color-inner" style="background-color: ${
+                item.randomColor
+              }"></div>
+                <div>${item.inputName}: ${formatValue(item.inputValue)}</div>
+              </div>`
+          )
           .join('');
 
         dataContainer.innerHTML = content;
@@ -336,6 +485,7 @@ const buildSlider = (slides) => {
           let calapseContainer = dataBox.querySelector('.collapse');
           if (sectionSum !== 0 && !calapseContainer) {
             dataSelector.after(collapseContainer);
+            console.log(dataContainer);
             collapseContainer.after(dataContainer);
           }
           if (updateDataContainer) {
@@ -422,36 +572,21 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteInput(btm);
       });
 
-      document.querySelectorAll('.add-btm').forEach((btm) => {
-        btm.addEventListener('click', (e) => {
-          e.preventDefault();
-          const addInputValue = e.target.previousElementSibling;
-          const val = addInputValue.value;
-          const nextElTarget = e.target.nextElementSibling;
-          const errorDiv = createErrorContainer(
-            'Please enter value for the field.'
-          );
-          if (!val) {
-            if (!nextElTarget) {
-              e.target.after(errorDiv);
-            } else {
-              nextElTarget.classList.remove('hide');
-            }
-          } else {
-            if (nextElTarget) {
-              nextElTarget.classList.add('hide');
-            }
-            const newEl = creatInput(val, e.target);
-            newEl.focus();
-          }
-        });
-      });
+      //Add event listener for add button
+      const addBtns = document.querySelectorAll('.add-btm');
+      addInput(addBtns);
 
       //Inputs value validation
       document
         .querySelectorAll('.input-set input:not(.add-new-item)')
         .forEach((el) => {
           validation(el);
+        });
+
+      document
+        .querySelectorAll('fieldset input:not(.add-new-item)')
+        .forEach((el) => {
+          createDataArray(el);
         });
 
       //build slider and progress bar
@@ -462,39 +597,83 @@ document.addEventListener('DOMContentLoaded', () => {
   xhttp.send();
 });
 
-let myChart = null;
 document.getElementById('calculate').addEventListener('click', (e) => {
   e.preventDefault();
+  const chartHeadiong = document.getElementById('chart-title');
+  waitForElement('div[dir]').then((element) => {
+    chartHeadiong.classList.remove('hide');
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
-  const targetElement = document.getElementById('charts');
-  if (window.innerWidth <= 768) {
-    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  // let expensestoDisplay = document.querySelectorAll(
+  //   '#expenses-breakpoints .data-container .flex-box'
+  // );
+
+  // let expensesText = [];
+
+  // expensestoDisplay.forEach((i) => {
+  //   if (!i.querySelector('div').classList.contains('test-color-inner')) {
+  //     let div = i.querySelectorAll('div');
+  //     div.forEach((item) => {
+  //       // if (!item.classList.contains('.test-color-inner')) {
+  //       let text = item.innerText.split(':');
+  //       let number = text[1].replace('$', '');
+  //       number = number.replace(',', '');
+  //       const randomColor = generateWarmHexColor();
+  //       const colorDiv = createElementWithClasses('div', 'test-color-inner');
+  //       colorDiv.style.background = randomColor;
+  //       item.before(colorDiv);
+  //       let newItem = { name: text[0], value: +number, color: randomColor };
+  //       expensesText.push(newItem);
+  //       // }
+  //     });
+  //   }
+  // });
+
+  // console.log(expensesText);
 
   // Destroy previous chart if exists
   if (myChart) {
     myChart.destroy();
   }
   const inputs = document.querySelectorAll('fieldset input:not(.add-new-item)');
-  const inputsValues = getInputsValues(inputs);
-  // Create new chart
-  createNewChart(inputsValues);
+
+  createNewChart(dataArray.map((item) => item.inputValue));
+
+  const arrOfArrays = dataArray.map((obj) => {
+    // Return an object with 'key' and 'value' properties
+    return [obj.inputName, obj.inputValue];
+  });
+
+  const colorsArr = dataArray.map((item) => item.randomColor);
+  drawChart(arrOfArrays, colorsArr);
+  google.charts.setOnLoadCallback(drawChart);
 
   // Display sum
   // const sum = inputsValues.reduce((acc, obj) => acc + obj.value, 0);
   // document.getElementById('sum').innerText = formatValue(sum);
 });
 
-function getInputsValues(inputs) {
-  let arr = [];
-  inputs.forEach((el) => {
-    const value = el.value.replace(/[$,]/g, ''); // Remove '$' and ',' from input values
-    if (value && value != 0) {
-      let obj = { key: el.dataset.inputlabename, value: +value };
-      arr.push(obj);
+//Function to create data array
+function createDataArray(input) {
+  input.addEventListener('blur', () => {
+    let inputValue = +input.value.replace(/[$,]/g, '');
+    const inputId = input.id;
+    const inputName = input.dataset.inputlabename;
+    const category = input.dataset.category;
+    const randomColor = generateWarmHexColor(); // Generate random color
+    const inputIndex = dataArray.findIndex((item) => item.inputId === inputId);
+
+    if (inputIndex === -1 && inputValue !== 0) {
+      dataArray.push({ inputId, inputName, inputValue, category, randomColor });
+    } else if (inputIndex >= 0 && inputValue !== 0) {
+      dataArray[inputIndex].inputValue = inputValue;
+    } else if (inputIndex >= 0 && (inputValue === 0 || !inputValue)) {
+      dataArray.splice(inputIndex, 1);
     }
+
+    console.log(dataArray);
   });
-  return arr;
 }
 
 function createNewChart(arr) {
@@ -526,6 +705,62 @@ function createNewChart(arr) {
       },
     },
   });
+}
+
+// Load the Visualization API and the corechart package.
+google.charts.load('current', { packages: ['corechart'] });
+
+//Function to draws a chart.
+function drawChart(arr, colorsArr) {
+  // Create the data table.
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Topping');
+  data.addColumn('number', 'Slices');
+  data.addRows(arr);
+
+  let width = 450;
+  let height = 450;
+
+  if (window.innerWidth <= 768) {
+    width = 300;
+    height = 300;
+  }
+
+  // Set chart options
+  var options = {
+    is3D: true,
+    fontName: '"Open Sans", sans-serif',
+    backgroundColor: 'transparent',
+    width: width,
+    height: height,
+    legend: {
+      position: 'bottom',
+      alignment: 'center',
+      textStyle: { color: '#52504f', fontSize: 16 },
+    },
+    chartArea: { width: '70%', height: '70%' },
+    colors: colorsArr,
+    titleTextStyle: {
+      color: '#52504f',
+      fontSize: 16,
+      textAlign: 'center',
+      bold: false,
+    },
+    titlePosition: 'center',
+    tooltip: {
+      color: '#52504f',
+      fontName: '"Open Sans", sans-serif',
+      fontSize: 12,
+      bold: false,
+      italic: true,
+    },
+  };
+
+  // Instantiate and draw our chart, passing in some options.
+  var chart = new google.visualization.PieChart(
+    document.getElementById('chart_div')
+  );
+  chart.draw(data, options);
 }
 
 //END
