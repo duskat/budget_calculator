@@ -153,6 +153,7 @@ button.prime-btn {
   height: 200px;
   display: flex;
   flex-wrap: wrap;
+  display: none;
 }
 
 .color-inner {
